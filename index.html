@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VocaType – Type along to your favorite songs</title>
+<meta name="description" content="Pick a YouTube music video, paste the lyrics, and type along line by line while it plays. Track your WPM and accuracy.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header class="top">
+    <h1>vocatype<span>.</span></h1>
+    <p>type along to the music</p>
+  </header>
+
+  <section class="player-wrap">
+    <div id="player-ph" class="player-ph">Select a video to begin</div>
+    <div id="player"></div>
+  </section>
+
+  <section class="hud">
+    <div class="stats">
+      <div><label>Line</label><b id="sLine">0/0</b></div>
+      <div><label>WPM</label><b id="sWpm">0</b></div>
+      <div><label>Accuracy</label><b id="sAcc">100%</b></div>
+    </div>
+    <div class="ctrls">
+      <button id="bPrev" title="Previous line">‹</button>
+      <button id="bPlay" title="Play / pause">▶</button>
+      <button id="bRestart" title="Restart">↺</button>
+      <button id="bNext" title="Next line">›</button>
+      <span id="time">00:00 / 00:00</span>
+    </div>
+  </section>
+  <div class="bar"><i id="bar"></i></div>
+
+  <section class="stage" id="stage">
+    <div class="wave" id="wave"><svg viewBox="0 0 80 20"><path d="M2 10 C 12 0, 18 20, 28 10 S 48 0, 58 10 S 72 16, 78 10" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
+    <div class="line" id="line">Select a video to start typing</div>
+    <div class="echo" id="echo"></div>
+    <input id="input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type here...">
+  </section>
+
+  <nav class="tools">
+    <button id="bVideo">▶ Select Video</button>
+    <label>Mode
+      <select id="mode"><option value="type">Type</option><option value="read">Read</option></select>
+    </label>
+    <label>Speed
+      <select id="rate"><option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select>
+    </label>
+    <label><input type="checkbox" id="punct" checked> Punctuation</label>
+    <label><input type="checkbox" id="case"> Match case</label>
+    <button id="bTheme">◐ Theme</button>
+  </nav>
+</main>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <h2>Select video</h2>
+    <label>YouTube link
+      <input id="url" placeholder="https://www.youtube.com/watch?v=..." required>
+    </label>
+    <label>Lyrics <small>one line per row. Optional timestamps: <code>[0:23] line</code> or <code>0:23 line</code></small>
+      <textarea id="lyrics" rows="10" placeholder="Paste lyrics here..." required></textarea>
+    </label>
+    <div class="row">
+      <button type="button" id="demo">Load demo</button>
+      <span class="sp"></span>
+      <button value="cancel" formnovalidate>Cancel</button>
+      <button id="go" value="ok" class="primary">Start</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="app.js"></script>
+</body>
+</html>
