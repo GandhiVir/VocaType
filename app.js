@@ -20,12 +20,12 @@ function mount() {
   if (yt && yt.loadVideoById) { yt.loadVideoById(vid); return; }
   yt = new YT.Player('player', {
     videoId: vid,
-    playerVars: { playsinline: 1, rel: 0, cc_load_policy: 1 },
+    playerVars: { playsinline: 1, autoplay: 1, rel: 0, cc_load_policy: 1 },
     events: { onStateChange: e => { $('bPlay').textContent = e.data === 1 ? '❚❚' : '▶'; } }
   });
 }
 
-function show(i) {
+function show(i, seek) {
   if (i < 0 || i >= lines.length) return;
   idx = i;
   $('wave').classList.add('hide');
@@ -35,7 +35,7 @@ function show(i) {
   $('bar').style.width = ((i + 1) / lines.length * 100) + '%';
   render('');
   $('input').focus();
-  if (yt && yt.seekTo && lines[i].t != null) yt.seekTo(lines[i].t, true);
+  if (seek && yt && yt.seekTo && lines[i].t != null) yt.seekTo(lines[i].t, true);
 }
 const norm = s => {
   if (!$('punct').checked) s = s.replace(/[^\p{L}\p{N}\s]/gu, '');
@@ -52,7 +52,7 @@ function render(v) {
   $('line').innerHTML = h;
 }
 function stats() {
-  const mins = (Date.now() - startT) / 60000;
+  const mins = Math.max(Date.now() - startT, 3000) / 60000;
   $('sWpm').textContent = startT && mins > 0 ? Math.round(done / 5 / mins) : 0;
   $('sAcc').textContent = (typed ? Math.round((typed - errors) / typed * 100) : 100) + '%';
 }
@@ -71,9 +71,9 @@ $('input').addEventListener('input', e => {
     if (idx + 1 < lines.length) show(idx + 1); else $('echo').textContent = 'Finished! 🎉';
   }
 });
-$('bNext').onclick = () => show(Math.min(idx + 1, lines.length - 1));
-$('bPrev').onclick = () => show(Math.max(idx - 1, 0));
-$('bRestart').onclick = () => { if (!lines.length) return; errors = typed = done = 0; startT = 0; stats(); show(0); if (yt && yt.seekTo) yt.seekTo(lines[0].t || 0, true); };
+$('bNext').onclick = () => show(Math.min(idx + 1, lines.length - 1), true);
+$('bPrev').onclick = () => show(Math.max(idx - 1, 0), true);
+$('bRestart').onclick = () => { if (!lines.length) return; errors = typed = done = 0; startT = 0; stats(); show(0, true); if (yt && yt.seekTo) yt.seekTo(lines[0].t || 0, true); };
 $('bPlay').onclick = () => { if (!yt || !yt.getPlayerState) return; yt.getPlayerState() === 1 ? yt.pauseVideo() : yt.playVideo(); };
 $('rate').onchange = e => yt && yt.setPlaybackRate && yt.setPlaybackRate(+e.target.value);
 $('punct').onchange = $('case').onchange = () => idx >= 0 && render($('input').value);
@@ -87,7 +87,7 @@ $('form').addEventListener('submit', e => {
   if (!id) { e.preventDefault(); $('url').setCustomValidity('Invalid YouTube link'); $('url').reportValidity(); return; }
   lines = parseLyrics($('lyrics').value); vid = id; errors = typed = done = 0; startT = 0; stats();
   if (ready) mount();
-  show(0);
+  show(0, true);
 });
 setInterval(() => {
   if (yt && yt.getCurrentTime && vid) $('time').textContent = fmt(yt.getCurrentTime()) + ' / ' + fmt(yt.getDuration() || 0);
